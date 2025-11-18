@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kalbro</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body {
+      margin: 0; height: 100vh; display: flex;
+      justify-content: center; align-items: center;
+      overflow: hidden; background: linear-gradient(180deg, #f5f5f5, #222);
+    }
+
+    .calculator {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+      backdrop-filter: blur(10px); border-radius: 20px;
+      background-image: url(https://tse3.mm.bing.net/th/id/OIP.fNMXQro9Xc5J2yvQbLoe0QHaEK?pid=Api&P=0&h=180);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 20px; width: 320px; text-align: center; z-index: 10;
+    }
+
+    h2 { color: #222; margin-bottom: 15px; }
+    .display {
+      width: 100%; height: 50px; font-size: 24px; padding: 10px;
+      text-align: right; border: none; border-radius: 12px;
+      margin-bottom: 5px; background: #fff; color: #111;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .sub-text { font-size: 12px; color: #333; margin-bottom: 15px; text-align: right; font-style: italic; }
+
+    .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .button {
+      padding: 10px; font-size: 18px; border: none; border-radius: 12px;
+      background-color: #eee; color: #111; cursor: pointer;
+      transition: 0.2s; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .button span.small-text { font-size: 10px; color: #444; margin-top: 3px; }
+    .button:hover { background-color: #ddd; transform: scale(1.05); }
+    .button.operator { background-color: #999; color: white; }
+    .button.equal { background-color: #222; color:white; }
+    .button.clear { background-color: #d11; grid-column: span 4; color:white; }
+
+    .history {
+      margin-top: 20px; background: #f1f1f1;
+      padding: 10px; border-radius: 12px; max-height: 150px;
+      overflow-y: auto; text-align: left;
+    }
+    .history h4 { color: #222; margin: 0 0 10px 0; font-size: 16px; display:flex; justify-content:space-between; align-items:center; }
+    .history p {
+      color: #111; font-size: 14px; margin: 2px 0;
+      border-bottom: 1px dashed #bbb; padding-bottom: 3px;
+      opacity: 0; transform: translateY(-10px);
+      animation: fadeIn 0.4s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .currency-box { margin-top: 15px; display: flex; justify-content: space-between; gap: 5px; }
+    select, button {
+      padding: 6px; border-radius: 8px; border: none; background: #eee;
+    }
+    #result { color: #222; margin-top: 10px; font-weight: bold; }
+
+    @keyframes jedagJedug {
+      0%   { transform: scale(1); color:#222; text-shadow: 0 0 5px #fff; }
+      25%  { transform: scale(1.2); color:#ff0000; text-shadow: 0 0 20px #ff0000; }
+      50%  { transform: scale(1); color:#222; text-shadow: 0 0 5px #fff; }
+      75%  { transform: scale(1.2); color:#00ff00; text-shadow: 0 0 20px #00ff00; }
+      100% { transform: scale(1); color:#222; text-shadow: 0 0 5px #fff; }
+    }
+
+    h2 {
+      animation: jedagJedug 1s infinite;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .delete-history {
+      font-size: 12px; background:#d11; color:#fff; padding:4px 8px;
+      border-radius:6px; cursor:pointer; border:none;
+    }
+    .delete-history:hover { background:#a00; }
+  </style>
+</head>
+<body>
+
+<!-- Kalkulator + Konversi -->
+<div class="calculator">
+  <h2>Kalbro</h2>
+  <input type="text" class="display" id="display" disabled>
+  <div class="sub-text" id="subText">Masukkan angka & hitung</div>
+  
+  <div class="buttons">
+    <div class="button" onclick="appendToDisplay('7')">7 <span class="small-text">Seven</span></div>
+    <div class="button" onclick="appendToDisplay('8')">8 <span class="small-text">Eight</span></div>
+    <div class="button" onclick="appendToDisplay('9')">9 <span class="small-text">Nine</span></div>
+    <div class="button operator" onclick="appendToDisplay('/')">÷</div>
+    <div class="button" onclick="appendToDisplay('4')">4 <span class="small-text">Four</span></div>
+    <div class="button" onclick="appendToDisplay('5')">5 <span class="small-text">Five</span></div>
+    <div class="button" onclick="appendToDisplay('6')">6 <span class="small-text">Six</span></div>
+    <div class="button operator" onclick="appendToDisplay('*')">×</div>
+    <div class="button" onclick="appendToDisplay('1')">1 <span class="small-text">One</span></div>
+    <div class="button" onclick="appendToDisplay('2')">2 <span class="small-text">Two</span></div>
+    <div class="button" onclick="appendToDisplay('3')">3 <span class="small-text">Three</span></div>
+    <div class="button operator" onclick="appendToDisplay('-')">-</div>
+    <div class="button" onclick="appendToDisplay('0')">0 <span class="small-text">Zero</span></div>
+    <div class="button" onclick="appendToDisplay('.')">. <span class="small-text">Dot</span></div>
+    <div class="button equal" onclick="calculate()">= <span class="small-text">Equal</span></div>
+    <div class="button operator" onclick="appendToDisplay('+')">+ <span class="small-text">Plus</span></div>
+    <div class="button clear" onclick="clearDisplay()">C</div>
+  </div>
+
+  <!-- Konversi -->
+  <div class="currency-box">
+    <select id="fromCurrency">
+      <option value="IDR">IDR</option>
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="JPY">JPY</option>
+      <option value="ATS">ATS</option>
+    </select>
+    <span style="align-self:center;">➡</span>
+    <select id="toCurrency">
+      <option value="USD">USD</option>
+      <option value="IDR">IDR</option>
+      <option value="EUR">EUR</option>
+      <option value="JPY">JPY</option>
+      <option value="ATS">ATS</option>
+    </select>
+  </div>
+  <button onclick="convertCurrency()">Konversi</button>
+  <p id="result"></p>
+
+  <!-- History -->
+  <div class="history" id="historyBox">
+    <h4>📜 History 
+      <button class="delete-history" onclick="clearHistory()">Hapus</button>
+    </h4>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<script>
+  const display = document.getElementById('display');
+  const subText = document.getElementById('subText');
+  const historyList = document.getElementById('historyList');
+
+  // Fungsi suara
+  function speak(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'id-ID';
+    speechSynthesis.speak(utterance);
+  }
+
+  function appendToDisplay(value) {
+    display.value += value;
+    subText.innerText = "Sedang menghitung...";
+
+    if (!isNaN(value)) { speak(value); }
+    if (value === "+") speak("Tambah");
+    if (value === "-") speak("Kurang");
+    if (value === "*") speak("Kali");
+    if (value === "/") speak("Bagi");
+    if (value === ".") speak("Titik");
+  }
+    
+  function clearDisplay() {
+    display.value = '';
+    subText.innerText = "Layar dibersihkan";
+    speak("Layar dibersihkan");
+  }
+
+  function calculate() {
+    try {
+      const expression = display.value;
+      const result = eval(expression);
+      subText.innerText = "Hasil: " + result;
+      display.value = result;
+      addToHistory(expression + " = " + result);
+      speak("Hasilnya adalah " + result);
+    } catch {
+      display.value = 'Error';
+      subText.innerText = "Terjadi kesalahan!";
+      speak("Terjadi kesalahan");
+    }
+  }
+
+  function addToHistory(entry) {
+    const p = document.createElement("p");
+    p.innerText = entry;
+    historyList.prepend(p);
+  }
+
+  function clearHistory() {
+    historyList.innerHTML = "";
+    subText.innerText = "History dihapus";
+    speak("History dihapus");
+  }
+
+  document.addEventListener('keydown', function (e) {
+    const key = e.key;
+    if ("0123456789.+-*/".includes(key)) {
+      appendToDisplay(key);
+    } else if (key === 'Enter') {
+      e.preventDefault();
+      calculate();
+    } else if (key === 'Backspace') {
+      display.value = display.value.slice(0, -1);
+    } else if (key === 'Escape') {
+      clearDisplay();
+    }
+  });
+
+  const rates = { "IDR": 1, "USD": 16000, "EUR": 18500, "JPY": 110, "ATS": 1000 };
+
+  function convertCurrency() {
+    const amount = parseFloat(display.value);
+    const from = document.getElementById("fromCurrency").value;
+    const to = document.getElementById("toCurrency").value;
+    const resultEl = document.getElementById("result");
+
+    if (isNaN(amount)) {
+      resultEl.innerText = "⚠ Masukkan nominal angka di kalkulator!";
+      speak("Masukkan nominal angka di kalkulator");
+      return;
+    }
+
+    let amountInIDR = amount * rates[from];
+    let converted = amountInIDR / rates[to];
+
+    const resultText = amount + " " + from + " = " + converted.toFixed(2) + " " + to;
+    resultEl.innerText = resultText;
+
+    // Tambahkan ke history juga
+    addToHistory(resultText);
+
+    speak(amount + " " + from + " sama dengan " + converted.toFixed(2) + " " + to);
+  }
+</script>
+</body>
+</html>
